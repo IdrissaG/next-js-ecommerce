@@ -22,7 +22,7 @@ async function getData(category: string) {
   revalidatePath("/");
   return data;
 }
-
+export const dynamic = "force-dynamic";
 export default async function CategoryPage({
   params,
 }: {

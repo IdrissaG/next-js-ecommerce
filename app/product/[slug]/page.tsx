@@ -1,4 +1,5 @@
 import AddToBag from "@/app/components/AddToBag";
+import CheckoutNow from "@/app/components/CheckOutNow";
 import ImageGallery from "@/app/components/imageGallery";
 import { fullProduct } from "@/app/interface";
 import { client } from "@/app/lib/sanity";
@@ -19,7 +20,7 @@ async function getData(slug: string) {
   const data = await client.fetch(query);
   return data;
 }
-
+export const dynamic = "force-dynamic";
 export default async function ProductPage({
   params,
 }: {
@@ -74,8 +75,17 @@ export default async function ProductPage({
                 price_id={data.price_id}
                 key={data._id}
               ></AddToBag>
+              <CheckoutNow
+                currency="XOF"
+                description={data.description}
+                image={data.images[0]}
+                name={data.name}
+                price={data.price}
+                price_id={data.price_id}
+                key={data._id}
+              />
 
-              <Button variant={"secondary"}>Checkout now</Button>
+              {/* <Button variant={"secondary"}>Checkout now</Button> */}
             </div>
             <p className="mt-12 text-base text-gray-500 tracking-wide">
               {data.description}
