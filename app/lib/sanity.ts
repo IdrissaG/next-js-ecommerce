@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { createClient } from "next-sanity";
 import imageUrlBuilder from "@sanity/image-url";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
