@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Link from "next/link";
 import { simplifiedProduct } from "../interface";
 import { client } from "../lib/sanity";

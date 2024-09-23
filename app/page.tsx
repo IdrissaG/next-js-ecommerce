@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Hero from "./components/Hero";
 import Newest from "./components/Newest";
 

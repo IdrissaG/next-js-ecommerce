@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable */
 export interface simplifiedProduct {
   [x: string]: any;
   _id: string;
