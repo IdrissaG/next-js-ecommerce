@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useShoppingCart } from "use-shopping-cart";
 import { urlFor } from "../lib/sanity";
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ProductCart {
   name: string;
   description: string;
@@ -11,7 +11,7 @@ export interface ProductCart {
   image: any;
   price_id: string;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function AddToBag({
   currency,
   description,

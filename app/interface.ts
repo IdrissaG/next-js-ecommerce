@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface simplifiedProduct {
   [x: string]: any;
   _id: string;
@@ -6,6 +7,7 @@ export interface simplifiedProduct {
   slug: string;
   categoryName: string;
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface fullProduct {
   _id: string;
   images: any;

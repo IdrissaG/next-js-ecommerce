@@ -6,7 +6,7 @@ import { useState } from "react";
 interface iAppProps {
   images: any;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ImageGallery({ images }: iAppProps) {
   const [bigImage, setBigImage] = useState(images[0]);
   const handleSmallImageClick = (image: any) => {

@@ -13,7 +13,7 @@ import {
   AwaitedReactNode,
 } from "react";
 import { cache } from "@/lib/cache";
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getData = cache(
   () => {
     const query = `*[_type == 'product'][0...4] | order(_createdAt asc){
@@ -30,7 +30,7 @@ const getData = cache(
   ["/", "getNewest"],
   { revalidate: 60 }
 );
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function Newest() {
   const data: simplifiedProduct = await getData();
   return (

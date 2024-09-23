@@ -20,7 +20,7 @@ const links = [
     href: "/Boubou",
   },
 ];
-export default function navbar() {
+export default function Navbar() {
   const pathname = usePathname();
   const { handleCartClick } = useShoppingCart();
   return (
