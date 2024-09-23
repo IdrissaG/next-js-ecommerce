@@ -5,23 +5,53 @@ import { client } from "../lib/sanity";
 import Image from "next/image";
 import { revalidatePath } from "next/cache";
 
-async function getData(category: string) {
-  const query = `*[_type == 'product' && category->name == "${category}"]{
-  _id,
+async function getData(category?: string) {
+  let query;
+  if (category === "All") {
+    // Fetch all products if the category is "all"
+    query = `*[_type == 'product']{
+      _id,
       "imageUrl": images[0].asset->url,
-    price,
-    name,
-  "slug": slug.current,
-    "categoryName": category->name,
-  
-}`;
-  const data = client.fetch(query);
+      price,
+      name,
+      "slug": slug.current,
+      "categoryName": category->name
+    }`;
+  } else if (category) {
+    // Fetch products for a specific category
+    query = `*[_type == 'product' && category->name == "${category}"]{
+      _id,
+      "imageUrl": images[0].asset->url,
+      price,
+      name,
+      "slug": slug.current,
+      "categoryName": category->name
+    }`;
+  } else {
+    // Default to fetching all products if no category is provided
+    query = `*[_type == 'product']{
+      _id,
+      "imageUrl": images[0].asset->url,
+      price,
+      name,
+      "slug": slug.current,
+      "categoryName": category->name
+    }`;
+  }
+
+  const data = await client.fetch(query);
+
+  // Revalidate paths for categories or the home page as necessary
   revalidatePath("/Ensemble");
   revalidatePath("/Robe");
   revalidatePath("/Boubou");
+  revalidatePath("/All");
+
   revalidatePath("/");
+
   return data;
 }
+
 export const dynamic = "force-dynamic";
 export default async function CategoryPage({
   params,
