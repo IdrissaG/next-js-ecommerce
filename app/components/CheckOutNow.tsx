@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useShoppingCart } from "use-shopping-cart";
 import { urlFor } from "../lib/sanity";
 import { ProductCart } from "./AddToBag";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutNow({
   currency,
@@ -12,11 +13,7 @@ export default function CheckoutNow({
   price,
   price_id,
 }: ProductCart) {
-  const { checkoutSingleItem } = useShoppingCart();
-
-  function buyNow(priceId: string) {
-    checkoutSingleItem(priceId);
-  }
+  const router = useRouter();
   const product = {
     name: name,
     description: description,
@@ -30,7 +27,7 @@ export default function CheckoutNow({
     <Button
       variant="outline"
       onClick={() => {
-        buyNow(product.price_id);
+        router.push(`/checkout?name=${name}&price_id=${price_id}`);
       }}
     >
       CheckOut Now
