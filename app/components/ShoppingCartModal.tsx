@@ -1,5 +1,4 @@
-/* eslint-disable */
-"use client";
+"use client"; // Ensure this is a client component
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -8,6 +7,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useShoppingCart } from "use-shopping-cart";
 
 export default function ShoppingCartModal() {
@@ -18,20 +18,29 @@ export default function ShoppingCartModal() {
     cartDetails,
     removeItem,
     totalPrice,
-    redirectToCheckout,
   } = useShoppingCart();
 
-  async function handleCheckoutClick(event: any) {
+  const router = useRouter();
+
+  function handleCheckoutClick(event: React.MouseEvent) {
     event.preventDefault();
-    try {
-      const result = await redirectToCheckout();
-      if (result?.error) {
-        console.log("result");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+
+    // Collect product details
+    const items = Object.values(cartDetails ?? {}).map((entry) => ({
+      id: entry.id,
+      name: entry.name,
+      description: entry.description,
+      price: entry.price,
+      quantity: entry.quantity || 1,
+      image: entry.image,
+    }));
+
+    // Store product details in local storage
+    localStorage.setItem("cartItems", JSON.stringify(items));
+    // Redirect to the checkout page
+    router.push("/checkout");
   }
+
   return (
     <Sheet open={shouldDisplayCart} onOpenChange={() => handleCartClick()}>
       <SheetContent className="ms:max-w-lg w-[90vw]">

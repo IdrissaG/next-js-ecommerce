@@ -27,7 +27,9 @@ export default function CheckoutNow({
     <Button
       variant="outline"
       onClick={() => {
-        router.push(`/checkout?name=${name}&price_id=${price_id}`);
+        router.push(
+          `/checkout?name=${name}&description=${description}&imageUrl=${product.image}&price_id=${price_id}&price=${price}`
+        );
       }}
     >
       CheckOut Now
