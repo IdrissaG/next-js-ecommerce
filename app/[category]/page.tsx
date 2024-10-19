@@ -4,6 +4,7 @@ import { simplifiedProduct } from "../interface";
 import { client } from "../lib/sanity";
 import Image from "next/image";
 import { revalidatePath } from "next/cache";
+import { MotionDiv } from "../components/MotionDiv";
 
 async function getData(category?: string) {
   let query;
@@ -51,6 +52,21 @@ async function getData(category?: string) {
 
   return data;
 }
+const variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const childvariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 export const dynamic = "force-dynamic";
 export default async function CategoryPage({
@@ -67,9 +83,23 @@ export default async function CategoryPage({
             Our Products for {params.category}
           </h2>
         </div>
-        <div className="mt-6 grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
+        <MotionDiv
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          transition={{
+            ease: "easeInOut",
+            duration: "0.5",
+          }}
+          viewport={{ amount: 0 }}
+          className="mt-6 grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 "
+        >
           {data.map((product) => (
-            <div key={product._id} className="group relative">
+            <MotionDiv
+              variants={childvariants}
+              className="group relative"
+              key={product._id}
+            >
               <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80 ">
                 <Link href={`/product/${product.slug}`}>
                   <Image
@@ -96,9 +126,9 @@ export default async function CategoryPage({
                   CFA{product.price}
                 </p>
               </div>
-            </div>
+            </MotionDiv>
           ))}
-        </div>
+        </MotionDiv>
       </div>
     </div>
   );

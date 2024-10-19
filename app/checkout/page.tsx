@@ -4,6 +4,9 @@ import { useRouter } from "next/navigation";
 import { useShoppingCart } from "use-shopping-cart";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { client } from "../lib/sanity";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");
@@ -21,6 +24,8 @@ const PlaceOrder = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const router = useRouter();
+  const [isAlertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const { checkoutSingleItem } = useShoppingCart();
 
   useEffect(() => {
@@ -30,6 +35,27 @@ const PlaceOrder = () => {
       setCartItems(JSON.parse(storedItems));
     }
   }, []);
+  // get the data from sanity
+  const getProductByName = async (productName) => {
+    const query = `*[_type == "product" && name == $name]{
+      _id,
+      name,
+      price,
+      description,
+      image
+    }`;
+
+    const params = { name: productName };
+
+    try {
+      const product = await client.fetch(query, params);
+      console.log("Product Data:", product);
+      return product;
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      return null;
+    }
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -52,8 +78,8 @@ const PlaceOrder = () => {
 
   // Handle checkout click
   const handleCheckoutClick = async () => {
-    console.log(cartItems[0]?.quantity);
-    console.log(cartItems[0]?.price_id);
+    // console.log(cartItems[0]?.quantity);
+    // console.log(cartItems[0]?.price_id);
 
     if (method === "Stripe") {
       checkoutSingleItem(cartItems[0]?.price_id); // Assuming price_id exists
@@ -77,8 +103,13 @@ const PlaceOrder = () => {
         });
 
         if (response.ok) {
-          alert("Order placed successfully.");
-          router.push("/thank-you");
+          setAlertMessage("Order placed successfully.");
+          setAlertVisible(true);
+
+          // Redirect to the thank you page after a short delay
+          setTimeout(() => {
+            router.push("/thank-you");
+          }, 2000);
         } else {
           const errorData = await response.json();
           alert(`Error processing your order: ${errorData.error}`);

@@ -1,6 +1,7 @@
 // /pages/api/cod.js
 import nodemailer from "nodemailer";
 
+
 export default async function handler(req, res) {
   console.log("API handler invoked with method:", req.method);
 
@@ -43,7 +44,8 @@ auth: {
 
     try {
       await transporter.sendMail(mailOptions);
-      console.log("Email sent successfully");
+      // console.log("Email sent successfully");
+   
       res.status(200).json({ message: "Order placed successfully." });
     } catch (error) {
       console.error("Error sending email:", error);
