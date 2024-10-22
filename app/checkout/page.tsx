@@ -58,7 +58,21 @@ const PlaceOrder: React.FC = () => {
       return null;
     }
   };
+  const [subtotal, setSubtotal] = useState(0);
+  const [shippingFee] = useState(2000); // Example shipping fee
+  useEffect(() => {
+    const storedItems = localStorage.getItem("cartItems");
+    if (storedItems) {
+      const items = JSON.parse(storedItems);
+      setCartItems(items);
 
+      // Calculate subtotal
+      const total = items.reduce((sum: number, item: any) => {
+        return sum + item.price * item.quantity;
+      }, 0);
+      setSubtotal(total);
+    }
+  }, []);
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -103,16 +117,19 @@ const PlaceOrder: React.FC = () => {
         });
 
         if (response.ok) {
-          setAlertMessage("Order placed successfully.");
-          setAlertVisible(true);
+          // setAlertMessage("Order placed successfully.");
+          // setAlertVisible(true);
 
           // Redirect to the thank-you page after a short delay
-          setTimeout(() => {
-            router.push("/thank-you");
-          }, 2000);
+          // setTimeout(() => {
+          router.push("./stripe/success");
+          // }, 2000);
         } else {
           const errorData = await response.json();
           alert(`Error processing your order: ${errorData.error}`);
+          setTimeout(() => {
+            router.push("./stripe/error");
+          }, 2000);
         }
       } catch (error) {
         console.error("Error placing order:", error);
@@ -227,9 +244,31 @@ const PlaceOrder: React.FC = () => {
                 <p className="text-gray-600 line-clamp-4">{item.description}</p>
                 <p className="text-gray-800 font-semibold mt-2">
                   XOF{item.price}
+                  {/* ff {item.totalPrice} */}
                 </p>
+                <p className="text-gray-500">QTY: {item.quantity}</p>
               </div>
             ))}
+            {/* Order Summary */}
+            <div className="border border-gray-300 rounded p-4 mb-6">
+              <h2 className="font-semibold text-lg mb-3">Order Summary</h2>
+              <div className="space-y-2">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>XOF {subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping Fee</span>
+                  <span>XOF {shippingFee.toLocaleString()}</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between font-semibold text-lg">
+                    <span>Total</span>
+                    <span>XOF {(subtotal + shippingFee).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Payment Method Selection */}
             <h1 className="text-xl sm:text-2xl my-3 mt-6">Payment Method</h1>
@@ -244,7 +283,7 @@ const PlaceOrder: React.FC = () => {
                   }`}
                 ></p>
                 <p className="text-gray-500 text-sm font-medium mx-4">
-                  PAY WITH STRIPE
+                  STRIPE (SOON)
                 </p>
               </div>
               <div

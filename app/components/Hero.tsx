@@ -95,6 +95,12 @@ export default async function Hero() {
           >
             Boubou
           </Link>
+          <Link
+            href="/about"
+            className="flex w-1/3 items-center justify-center text-gray-500 transition duration-100 hover:bg-gray-100 active:bg-gray-200"
+          >
+            Contact
+          </Link>
         </div>
       </div>
     </section>

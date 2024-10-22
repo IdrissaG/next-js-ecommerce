@@ -38,6 +38,7 @@ export default function ShoppingCartModal() {
 
     // Store product details in local storage
     localStorage.setItem("cartItems", JSON.stringify(items));
+    handleCartClick();
     // Redirect to the checkout page
     router.push("/checkout");
   }

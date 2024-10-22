@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     
     const { firstName, lastName, email, street, city, state, zipcode, country, phone, productName, productPrice, productQuantity } = req.body;
 
-    if (!firstName || !lastName || !email || !street || !city || !state || !zipcode || !country || !phone || !productName || !productPrice || !productQuantity) {
+    if (!firstName || !lastName || !email || !street || !city || !country || !phone || !productName || !productPrice ) {
       return res.status(400).json({ error: "Please provide all required fields." });
     }
 
