@@ -44,7 +44,7 @@ const childvariants = {
 
 // Product type definition
 interface Product {
-  _id: Key | null | undefined;
+  _id: undefined;
   imageUrl: string | StaticImport;
   slug: string;
   name: string;
