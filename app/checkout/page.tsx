@@ -37,7 +37,7 @@ const PlaceOrder = () => {
     }
   }, []);
   // get the data from sanity
-  const getProductByName = async (productName) => {
+  const getProductByName = async (productName: string) => {
     const query = `*[_type == "product" && name == $name]{
       _id,
       name,
