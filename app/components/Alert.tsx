@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React, { useState } from "react";
-import { Alert, AlertTitle, AlertDescription } from "@your-alert-library"; // Adjust based on your library
-import { Terminal } from "your-icon-library"; // Adjust based on your icon library
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; // Adjust based on your library
 
 const MyAlert = () => {
   const [isAlertVisible, setAlertVisible] = useState(false);
@@ -19,7 +18,6 @@ const MyAlert = () => {
 
       {isAlertVisible && (
         <Alert>
-          <Terminal className="h-4 w-4" />
           <AlertTitle>Heads up!</AlertTitle>
           <AlertDescription>
             You can add components and dependencies to your app using the cli.

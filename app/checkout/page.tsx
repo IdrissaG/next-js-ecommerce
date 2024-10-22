@@ -108,7 +108,7 @@ const PlaceOrder: React.FC = () => {
 
           // Redirect to the thank-you page after a short delay
           setTimeout(() => {
-            router.push("checkout/thank-you");
+            router.push("/thank-you");
           }, 2000);
         } else {
           const errorData = await response.json();
