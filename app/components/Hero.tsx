@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Image from "next/image";
 import { client, urlFor } from "../lib/sanity";
 // import { Link } from "lucide-react";

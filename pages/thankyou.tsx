@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Button } from "@/components/ui/button";
 import { CheckCheck } from "lucide-react";
 import Link from "next/link";

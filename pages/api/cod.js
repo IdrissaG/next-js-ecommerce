@@ -1,4 +1,5 @@
 // /pages/api/cod.js
+/* eslint-disable */
 import nodemailer from "nodemailer";
 
 

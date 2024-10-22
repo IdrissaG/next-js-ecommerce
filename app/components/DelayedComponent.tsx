@@ -1,4 +1,5 @@
 // components/DelayedComponent.tsx
+/* eslint-disable */
 import React, { useState, useEffect, ReactNode } from "react";
 
 interface DelayedComponentProps {

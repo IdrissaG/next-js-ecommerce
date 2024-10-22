@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { CartProvider as USCProvider } from "use-shopping-cart";

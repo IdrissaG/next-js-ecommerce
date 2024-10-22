@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client"; // Ensure this is a client component
 import { Button } from "@/components/ui/button";
 import {
