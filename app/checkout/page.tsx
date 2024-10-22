@@ -9,7 +9,7 @@ import { client } from "../lib/sanity";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 
-const PlaceOrder = () => {
+const PlaceOrder: React.FC = () => {
   const [method, setMethod] = useState("cod");
   const [formData, setFormData] = useState({
     firstName: "",
@@ -23,7 +23,7 @@ const PlaceOrder = () => {
     phone: "",
   });
 
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState<any[]>([]); // Any type to avoid issues
   const router = useRouter();
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -36,7 +36,8 @@ const PlaceOrder = () => {
       setCartItems(JSON.parse(storedItems));
     }
   }, []);
-  // get the data from sanity
+
+  // Get product data from Sanity
   const getProductByName = async (productName: string) => {
     const query = `*[_type == "product" && name == $name]{
       _id,
@@ -66,11 +67,12 @@ const PlaceOrder = () => {
     });
   };
 
-  // Check for empty fields
-  const isFormValid = () => {
+  // Validate form fields
+  const isFormValid = (): boolean => {
     for (const field in formData) {
-      if (formData[field].trim() === "") {
-        alert(`Please fill out the ${field} field.`);
+      const typedField = field as keyof typeof formData;
+      if (formData[typedField].trim() === "") {
+        alert(`Please fill out the ${typedField} field.`);
         return false;
       }
     }
@@ -79,9 +81,6 @@ const PlaceOrder = () => {
 
   // Handle checkout click
   const handleCheckoutClick = async () => {
-    // console.log(cartItems[0]?.quantity);
-    // console.log(cartItems[0]?.price_id);
-
     if (method === "Stripe") {
       checkoutSingleItem(cartItems[0]?.price_id); // Assuming price_id exists
     } else if (method === "cod") {
@@ -107,9 +106,9 @@ const PlaceOrder = () => {
           setAlertMessage("Order placed successfully.");
           setAlertVisible(true);
 
-          // Redirect to the thank you page after a short delay
+          // Redirect to the thank-you page after a short delay
           setTimeout(() => {
-            router.push("/thank-you");
+            router.push("checkout/thank-you");
           }, 2000);
         } else {
           const errorData = await response.json();
