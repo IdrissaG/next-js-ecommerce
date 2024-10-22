@@ -23,15 +23,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Product } from "use-shopping-cart/core";
-
-// Sanity Client configuration
-const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-  apiVersion: "2024-02-22",
-  useCdn: true,
-});
+import { client } from "../lib/sanity";
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  slug: string;
+  imageUrl: string;
+  category?: {
+    name: string;
+  };
+}
 
 const links = [
   { name: "Home", href: "/" },
@@ -44,10 +47,18 @@ const links = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { handleCartClick, cartCount } = useShoppingCart();
+
+  const {
+    cartCount,
+    shouldDisplayCart,
+    handleCartClick,
+    cartDetails,
+    removeItem,
+    totalPrice,
+  } = useShoppingCart();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -214,7 +225,7 @@ export default function Navbar() {
           >
             <div className="relative">
               <ShoppingBagIcon />
-              {cartCount > 0 && (
+              {(cartCount ?? 0) > 0 && (
                 <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center">
                   <span className="text-xs text-white">{cartCount}</span>
                 </div>
