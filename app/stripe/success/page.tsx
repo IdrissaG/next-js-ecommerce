@@ -9,12 +9,12 @@ export default function stripeSuccess() {
         <CheckCheck className="text-green-600 w-16 h-16 mx-auto my-6"></CheckCheck>
         <div className="text-center">
           <h3 className="md:text-2xl text-base text-gray-900 font-semibold text-center">
-            Payment Done!
+            Order Received!
           </h3>
-          <p>Thank you for your purchase we hope you enjoy it</p>
+          <p>Thank you for your order we will reach out to you soon!</p>
           <p>Have a great day!</p>
           <Button asChild className="mt-5">
-            <Link href="/">GO back</Link>
+            <Link href="/">Go Back</Link>
           </Button>
         </div>
       </div>

@@ -75,7 +75,7 @@ export default async function ProductPage({
                 price_id={data.price_id}
                 key={data._id}
               ></AddToBag>
-              <CheckoutNow
+              {/* <CheckoutNow
                 currency="XOF"
                 description={data.description}
                 image={data.images[0]}
@@ -83,7 +83,7 @@ export default async function ProductPage({
                 price={data.price}
                 price_id={data.price_id}
                 key={data._id}
-              />
+              /> */}
 
               {/* <Button variant={"secondary"}>Checkout now</Button> */}
             </div>

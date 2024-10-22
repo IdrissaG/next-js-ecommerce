@@ -18,7 +18,7 @@ const PlaceOrder: React.FC = () => {
     street: "",
     city: "",
     state: "",
-    zipcode: "",
+    // zipcode: "",
     country: "",
     phone: "",
   });
@@ -199,14 +199,14 @@ const PlaceOrder: React.FC = () => {
               />
             </div>
             <div className="flex gap-3">
-              <input
+              {/* <input
                 name="zipcode"
                 value={formData.zipcode}
                 onChange={handleInputChange}
                 className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
                 type="text"
                 placeholder="Zip Code"
-              />
+              /> */}
               <input
                 name="country"
                 value={formData.country}

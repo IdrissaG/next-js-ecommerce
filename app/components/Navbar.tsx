@@ -1,15 +1,10 @@
-/* eslint-disable */
-//@ts-ignore
 "use client";
-
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ShoppingBagIcon, Search, X } from "lucide-react";
+import { ShoppingBagIcon, Search, X, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useShoppingCart } from "use-shopping-cart";
-import { useState } from "react";
-import { createClient } from "next-sanity";
 import {
   Command,
   CommandEmpty,
@@ -23,7 +18,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { client } from "../lib/sanity";
+
 interface Product {
   _id: string;
   name: string;
@@ -47,34 +44,26 @@ const links = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { cartCount, handleCartClick } = useShoppingCart();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    cartCount,
-    shouldDisplayCart,
-    handleCartClick,
-    cartDetails,
-    removeItem,
-    totalPrice,
-  } = useShoppingCart();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Debounced search function with inline query
-  const handleSearch = async (value: string) => {
-    setSearchQuery(value);
-
-    if (value.length < 2) {
+  const performSearch = async (query: string) => {
+    if (query.length < 2) {
       setSearchResults([]);
       return;
     }
 
     setIsSearching(true);
     try {
-      // Sanity query directly in the component
-      const query = `*[_type == "product" && (name match $searchQuery || description match $searchQuery)] {
+      const searchQuery = `*[_type == "product" && (name match $searchQuery || description match $searchQuery)] {
         _id,
         name,
         description,
@@ -84,8 +73,8 @@ export default function Navbar() {
         category->{ name }
       }`;
 
-      const results = await client.fetch(query, {
-        searchQuery: `*${value}*`,
+      const results = await client.fetch(searchQuery, {
+        searchQuery: `*${query}*`,
       });
       setSearchResults(results);
     } catch (error) {
@@ -96,16 +85,65 @@ export default function Navbar() {
     }
   };
 
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    setSearchQuery(value);
+    performSearch(value);
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen && inputValue.length >= 2) {
+      performSearch(inputValue);
+    }
+    if (isOpen) {
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 0);
+    }
+  };
+
   const handleSelectProduct = (product: Product) => {
     router.push(`/product/${product.slug}`);
     setOpen(false);
-    setSearchQuery("");
-    setSearchResults([]);
+    setShowSearch(false);
+  };
+
+  const handleMenuItemClick = (href: string) => {
+    router.push(href);
+    setIsMenuOpen(false);
   };
 
   return (
     <header className="mb-8 border-b">
       <div className="flex items-center justify-between mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl">
+        {/* Menu Button (Mobile) */}
+        <div className="lg:hidden">
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="mr-2">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64">
+              <nav className="flex flex-col gap-4 mt-8">
+                {links.map((link, idx) => (
+                  <Button
+                    key={idx}
+                    variant={pathname === link.href ? "default" : "ghost"}
+                    className="justify-start"
+                    onClick={() => handleMenuItemClick(link.href)}
+                  >
+                    {link.name}
+                  </Button>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {/* Logo */}
         <div className={`${showSearch ? "hidden sm:block" : "block"}`}>
           <Link href="/">
@@ -117,9 +155,25 @@ export default function Navbar() {
 
         {/* Search Bar with Popover */}
         <div
-          className={`flex-1 max-w-md mx-4 ${showSearch ? "block" : "hidden sm:block"}`}
+          className={`flex-1 max-w-md mx-4 ${
+            showSearch
+              ? "fixed inset-x-0 top-0 z-50 bg-white p-4 flex items-center sm:relative sm:p-0"
+              : "hidden sm:block"
+          }`}
         >
-          <Popover open={open} onOpenChange={setOpen}>
+          {/* Mobile Close Button */}
+          {showSearch && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="mr-2 sm:hidden"
+              onClick={() => setShowSearch(false)}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          )}
+
+          <Popover open={open} onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -129,26 +183,40 @@ export default function Navbar() {
               >
                 <Search className="mr-2 h-4 w-4" />
                 <span className="text-sm text-gray-500">
-                  {searchQuery || "Search products..."}
+                  {inputValue || "Search products..."}
                 </span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0" align="start">
+            <PopoverContent
+              className="w-[400px] p-0 sm:w-[400px]"
+              align="start"
+              sideOffset={5}
+            >
               <Command>
-                <CommandInput
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onValueChange={handleSearch}
-                />
+                <div className="flex items-center border-b px-3">
+                  <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <input
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="Search products..."
+                    className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
                 <CommandList>
                   <CommandEmpty>
-                    {isSearching ? "Searching..." : "No results found."}
+                    {isSearching
+                      ? "Searching..."
+                      : inputValue.length >= 2
+                        ? "No results found."
+                        : "Type at least 2 characters to search"}
                   </CommandEmpty>
                   <CommandGroup>
                     {searchResults.map((product) => (
                       <CommandItem
                         key={product._id}
                         onSelect={() => handleSelectProduct(product)}
+                        className="cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
                           {product.imageUrl && (
@@ -172,9 +240,27 @@ export default function Navbar() {
               </Command>
             </PopoverContent>
           </Popover>
+
+          {/* Mobile Cart Button when search is open */}
+          {showSearch && (
+            <Button
+              variant="outline"
+              onClick={() => handleCartClick()}
+              className="ml-2 sm:hidden"
+            >
+              <div className="relative">
+                <ShoppingBagIcon />
+                {(cartCount ?? 0) > 0 && (
+                  <div className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center">
+                    <span className="text-xs text-white">{cartCount}</span>
+                  </div>
+                )}
+              </div>
+            </Button>
+          )}
         </div>
 
-        {/* Navigation */}
+        {/* Navigation (Desktop) */}
         <nav
           className={`hidden gap-12 lg:flex 2xl:ml-16 ${showSearch ? "hidden lg:flex" : ""}`}
         >
@@ -231,9 +317,6 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            {/* <span className="hidden text-xs font-semibold text-gray-500 sm:block">
-              Cart
-            </span> */}
           </Button>
         </div>
       </div>

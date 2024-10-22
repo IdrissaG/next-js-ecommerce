@@ -75,7 +75,7 @@ export default async function Hero() {
           </div>
         </MotionDiv>
       </MotionDiv>
-      <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
+      {/* <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
         <div className="flex h-12 w-64 divide-x overflow-hidden rounded-lg">
           <Link
             href="/Ensemble"
@@ -102,7 +102,7 @@ export default async function Hero() {
             Contact
           </Link>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
