@@ -1,5 +1,6 @@
+/* eslint-disable */
 import AddToBag from "@/app/components/AddToBag";
-import CheckoutNow from "@/app/components/CheckOutNow";
+// import CheckoutNow from "@/app/components/CheckOutNow";
 import ImageGallery from "@/app/components/imageGallery";
 import { fullProduct } from "@/app/interface";
 import { client } from "@/app/lib/sanity";
