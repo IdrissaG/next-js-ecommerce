@@ -2,10 +2,12 @@
 import AddToBag from "@/app/components/AddToBag";
 // import CheckoutNow from "@/app/components/CheckOutNow";
 import ImageGallery from "@/app/components/imageGallery";
+import ProductRating from "@/app/components/ProductRating";
 import { fullProduct } from "@/app/interface";
 import { client } from "@/app/lib/sanity";
 import { Button } from "@/components/ui/button";
 import { Star, Truck } from "lucide-react";
+import { Metadata } from "next";
 
 async function getData(slug: string) {
   const query = `*[_type == 'product' && slug.current == "${slug}"][0]{
@@ -20,6 +22,18 @@ async function getData(slug: string) {
 }`;
   const data = await client.fetch(query);
   return data;
+}
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const product = await getData(params.slug);
+
+  return {
+    title: `${product.name} - ZeinabStore`,
+    description: product.description,
+  };
 }
 export const dynamic = "force-dynamic";
 export default async function ProductPage({
@@ -43,13 +57,9 @@ export default async function ProductPage({
               </h2>
             </div>
             <div className="mb-6 flex items-center gap-3 md:mb-10 ">
-              <Button className="rounded-full gap-x-2">
-                <text className="text-sm">4.2</text>
-                <Star className="h-5 w-5" />
-              </Button>
-              <span className="text-sm text-gray-500 transition duration-100">
-                56 Ratings
-              </span>
+              <div className="mb-6 flex items-center gap-3 md:mb-10 ">
+                <ProductRating productId={data._id} />
+              </div>
             </div>
             <div className="mb-4">
               <div className="flex items-end gap-2">

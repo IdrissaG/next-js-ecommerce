@@ -5,6 +5,7 @@ import { client } from "../lib/sanity";
 import Image from "next/image";
 import { revalidatePath } from "next/cache";
 import { MotionDiv } from "../components/MotionDiv";
+import { Metadata } from "next";
 
 async function getData(category?: string) {
   let query;
@@ -67,7 +68,18 @@ const childvariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
+export async function generateMetadata({
+  params,
+}: {
+  params: { category: string };
+}): Promise<Metadata> {
+  const product = await getData(params.category);
 
+  return {
+    title: `${params.category} - ZeinabStore`,
+    description: product.description,
+  };
+}
 export const dynamic = "force-dynamic";
 export default async function CategoryPage({
   params,
@@ -80,7 +92,9 @@ export default async function CategoryPage({
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-            Our Products for {params.category}
+            {params.category === "All"
+              ? "All Of Our Products"
+              : `Our Products for ${params.category}`}
           </h2>
         </div>
         <MotionDiv
