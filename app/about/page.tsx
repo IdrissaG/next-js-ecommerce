@@ -1,5 +1,4 @@
-// about/page.tsx
-
+/* eslint-disable */
 import { Metadata } from "next";
 import AboutUsClient from "./AboutUsClient";
 

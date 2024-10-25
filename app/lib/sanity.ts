@@ -6,6 +6,7 @@ export const client = createClient({
   projectId: "rq0e4a9i",
   dataset: "production",
   apiVersion: "2022-03-25",
+  token: process.env.SANITY_API_TOKEN,
   useCdn: true,
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

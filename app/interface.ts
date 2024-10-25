@@ -10,11 +10,13 @@ export interface simplifiedProduct {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface fullProduct {
   _id: string;
-  images: any;
+  images: any[];
   price: number;
-  slug: string;
-  categoryName: string;
   name: string;
   description: string;
+  slug: string;
+  categoryName: string;
   price_id: string;
+  averageRating: number;
+  ratingCount: number;
 }

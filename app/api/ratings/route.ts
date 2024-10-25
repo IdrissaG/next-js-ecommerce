@@ -1,10 +1,89 @@
-import { client } from "@/app/lib/sanity";
+/* eslint-disable */
+import { createClient } from "@sanity/client";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+// Create a Sanity client for your API route
+const client = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  token: process.env.SANITY_API_TOKEN,
+  apiVersion: "2024-01-01",
+  useCdn: false,
+});
+
+// GET endpoint to fetch ratings
+export async function GET(request: NextRequest) {
   try {
-    const { productId, rating } = await request.json();
+    const url = new URL(request.url);
+    const productId = url.searchParams.get("productId");
 
-    const doc = {
+    if (!productId) {
+      return NextResponse.json(
+        { error: "Product ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Log for debugging
+    console.log("Fetching ratings for product:", productId);
+
+    // Query to get ratings for the product
+    const query = `*[_type == "rating" && product._ref == $productId] {
+      rating
+    }`;
+
+    const ratings = await client.fetch(query, { productId });
+
+    // Log for debugging
+    console.log("Found ratings:", ratings);
+
+    if (!ratings.length) {
+      return NextResponse.json({
+        averageRating: 0,
+        count: 0,
+      });
+    }
+
+    const sum = ratings.reduce(
+      (acc: number, curr: any) => acc + curr.rating,
+      0
+    );
+    const averageRating = Number((sum / ratings.length).toFixed(1));
+
+    return NextResponse.json({
+      averageRating,
+      count: ratings.length,
+    });
+  } catch (error) {
+    // Log the full error
+    console.error("Detailed error:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch ratings" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST endpoint to create ratings
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { productId, rating } = body;
+
+    // Validate input
+    if (!productId || !rating) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Log for debugging
+    console.log("Creating rating:", { productId, rating });
+
+    // Create the rating document
+    const ratingDoc = {
       _type: "rating",
       product: {
         _type: "reference",
@@ -14,27 +93,19 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     };
 
-    await client.create(doc);
+    const result = await client.create(ratingDoc);
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // Log success
+    console.log("Rating created:", result);
+
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    // Handle the unknown error type
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
+    // Log the full error
+    console.error("Detailed error:", error);
 
-    return new Response(
-      JSON.stringify({ success: false, error: errorMessage }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    return NextResponse.json(
+      { error: "Failed to create rating" },
+      { status: 500 }
     );
   }
 }

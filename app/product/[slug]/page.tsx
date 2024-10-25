@@ -11,18 +11,38 @@ import { Metadata } from "next";
 
 async function getData(slug: string) {
   const query = `*[_type == 'product' && slug.current == "${slug}"][0]{
-  _id,
+    _id,
     price,
     images,
     name,
     description,
-  "slug": slug.current,
+    "slug": slug.current,
     "categoryName": category->name,
-     price_id
-}`;
+    price_id,
+    // Fetch the array of ratings
+    "ratings": *[_type == "rating" && product._ref == ^._id].rating
+  }`;
+
+  // Fetch the data
   const data = await client.fetch(query);
-  return data;
+
+  // Calculate averageRating and ratingCount in JavaScript
+  const ratings = data.ratings || [];
+  const ratingCount = ratings.length;
+  const averageRating =
+    ratingCount > 0
+      ? ratings.reduce((sum: number, rating: number) => sum + rating, 0) /
+        ratingCount
+      : 0;
+
+  // Add computed properties to the data
+  return {
+    ...data,
+    averageRating,
+    ratingCount,
+  };
 }
+
 export async function generateMetadata({
   params,
 }: {
@@ -58,7 +78,11 @@ export default async function ProductPage({
             </div>
             <div className="mb-6 flex items-center gap-3 md:mb-10 ">
               <div className="mb-6 flex items-center gap-3 md:mb-10 ">
-                <ProductRating productId={data._id} />
+                <ProductRating
+                  productId={data._id}
+                  initialRating={data.averageRating}
+                  initialCount={data.ratingCount}
+                />
               </div>
             </div>
             <div className="mb-4">
