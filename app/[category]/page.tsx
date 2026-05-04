@@ -8,97 +8,93 @@ import { revalidatePath } from "next/cache";
 async function getData(category?: string) {
   let query;
   if (category === "All") {
-    // Fetch all products if the category is "all"
     query = `*[_type == 'product']{
       _id,
       "imageUrl": images[0].asset->url,
-      price,
-      name,
+      price, name,
       "slug": slug.current,
       "categoryName": category->name
     }`;
   } else if (category) {
-    // Fetch products for a specific category
     query = `*[_type == 'product' && category->name == "${category}"]{
       _id,
       "imageUrl": images[0].asset->url,
-      price,
-      name,
+      price, name,
       "slug": slug.current,
       "categoryName": category->name
     }`;
   } else {
-    // Default to fetching all products if no category is provided
     query = `*[_type == 'product']{
       _id,
       "imageUrl": images[0].asset->url,
-      price,
-      name,
+      price, name,
       "slug": slug.current,
       "categoryName": category->name
     }`;
   }
-
   const data = await client.fetch(query);
-
-  // Revalidate paths for categories or the home page as necessary
   revalidatePath("/Ensemble");
   revalidatePath("/Robe");
   revalidatePath("/Boubou");
   revalidatePath("/All");
-
   revalidatePath("/");
-
   return data;
 }
 
 export const dynamic = "force-dynamic";
+
 export default async function CategoryPage({
   params,
 }: {
   params: { category: string };
 }) {
   const data: simplifiedProduct[] = await getData(params.category);
+
   return (
-    <div className="bg-white">
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
-            Our Products for {params.category}
-          </h2>
+    <div style={{ background: "var(--black)", minHeight: "100vh", paddingTop: "120px" }}>
+      <div className="section">
+
+        {/* En-tête */}
+        <div className="section-header">
+          <div>
+            <p className="section-label">Collection</p>
+            <h2 className="section-title">
+              {params.category === "All" ? (
+                <>Toutes les <em>Pièces</em></>
+              ) : (
+                <><em>{params.category}</em></>
+              )}
+            </h2>
+          </div>
+          <Link href="/" className="section-link">← Retour</Link>
         </div>
-        <div className="mt-6 grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 ">
+
+        {/* Grille produits */}
+        <div className="grid-4">
           {data.map((product) => (
-            <div key={product._id} className="group relative">
-              <div className="aspect-square w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:h-80 ">
-                <Link href={`/product/${product.slug}`}>
-                  <Image
-                    src={product.imageUrl}
-                    alt="Product image"
-                    className="w-full h-full object-cover object-center lg:h-full lg:w-full "
-                    width={300}
-                    height={300}
-                  />
-                </Link>
-              </div>
-              <div className="mt-4 flex justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-700">
-                    <Link href={`/product/${product.slug}`}>
-                      {product.name}
-                    </Link>
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {product.categoryName}
-                  </p>
-                </div>
-                <p className="text-sm font-medium text-gray-900">
-                  CFA{product.price}
-                </p>
+            <div key={product._id} className="card">
+              <Link href={`/product/${product.slug}`}>
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  width={400}
+                  height={533}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                />
+              </Link>
+              <div className="card-info">
+                <div className="card-name">{product.name}</div>
+                <div className="card-price">CFA {product.price}</div>
               </div>
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );
